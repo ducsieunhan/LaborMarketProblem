@@ -43,6 +43,7 @@ public class LaborMarketV2 extends AbstractProblem {
         for (int i = 0; i < N; i++) {
             randomizedEmployee[i] = employee[permutation.get(i)];
             int originalIndex = permutation.get(i);
+            System.out.println(permutation.get(i));
 
             randomizedEmployeePref[i] = employeePref[originalIndex];  // hoán vị danh sách ưu tiên
         }
@@ -50,7 +51,7 @@ public class LaborMarketV2 extends AbstractProblem {
 
         String[][] finalMatch = matching.calcMatches() ;
 
-        double statisfy = 0 ;
+        double totalStatisfy = 0 ;
 
 
         for(int i = 0 ; i < N ; i++){
@@ -60,21 +61,24 @@ public class LaborMarketV2 extends AbstractProblem {
             int employeeIndex = matching.employIndexOf(employeeName) ;
             for(int j = 0 ; j < N ; j++){
                 if (randomizedEmployeePref[employeeIndex][j].equals(companyName)){
-                    statisfy  += (N - j) ;
+                    totalStatisfy  += (N - j) ;
                     break ;
                 }
             }
             int companyIndex = matching.companyIndexOf(companyName) ;
             for(int j = 0 ; j < N ; j++){
                 if (companyPref[companyIndex][j].equals(employeeName)){
-                    statisfy  += (N - j) ;
+                    totalStatisfy  += (N - j) ;
                     break;
                 }
             }
         }
 
-        solution.setObjective(0, -statisfy);
+        solution.setObjective(0, -totalStatisfy);
         //
+        System.out.println();
+        System.out.println("----------------------------------");
+        System.out.println("Kết quả ghép cặp: ");
         for (int i = 0 ; i < N ; i++){
             System.out.println(finalMatch[0][i] + " vào công ty " + finalMatch[1][i]);
         }
@@ -83,7 +87,9 @@ public class LaborMarketV2 extends AbstractProblem {
     @Override
     public Solution newSolution() {
         Solution solution = new Solution(1, 1);
-        solution.setVariable(0, new Permutation(employee.length));
+        Permutation permutation = new Permutation(employee.length);
+        permutation.randomize(); // Ngẫu nhiên hóa thứ tự hoán vị
+        solution.setVariable(0, permutation);
         return solution;
     }
 }

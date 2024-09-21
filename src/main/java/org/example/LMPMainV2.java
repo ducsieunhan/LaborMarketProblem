@@ -1,16 +1,26 @@
 package org.example;
 
+import org.moeaframework.Executor;
+import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;
 
 public class LMPMainV2 {
     public static void main(String[] args) {
-        LaborMarketV2 laborMarket = new LaborMarketV2();
+        // Create an instance of the problem
+        LaborMarketV2 problem = new LaborMarketV2();
 
-        int populationSize = 100;
-        for (int i = 0; i < populationSize; i++) {
-            System.out.println("Danh sách phân bổ nhân viên và công ty: ");
-            Solution solution = laborMarket.newSolution();
-            laborMarket.evaluate(solution);
+        // Run the optimization algorithm
+        NondominatedPopulation result = new Executor()
+                .withProblem(problem)
+                .withAlgorithm("NSGAII")
+                .withMaxEvaluations(100)
+                .run();
+
+        // Output the results
+
+
+        for (Solution solution : result) {
+            System.out.println("Objective: " + -solution.getObjective(0));
         }
     }
 }
