@@ -12,20 +12,21 @@ public class LaborMarketV2 extends AbstractProblem {
      private final String[] company = {"C1", "C2", "C3", "C4", "C5"};
 
     private final String[][] employeePref = {
-            {"C3", "C2", "C1", "C5", "C4"},
-            {"C1", "C2", "C3", "C5", "C4"},
-            {"C5", "C2", "C3", "C1", "C4"},
-            {"C2", "C1", "C5", "C3", "C4"},
-            {"C4", "C5", "C3", "C2", "C1"}
+            {"C1", "C4", "C5", "C2", "C3"},
+            {"C4", "C1", "C2", "C3", "C5"},
+            {"C2", "C3", "C5", "C1", "C4"},
+            {"C5", "C4", "C2", "C1", "C3"},
+            {"C1", "C3", "C4", "C2", "C5"}
     };
 
     private final String[][] companyPref = {
-            {"E3", "E1", "E4", "E5", "E2"},
-            {"E2", "E3", "E4", "E1", "E5"},
-            {"E1", "E4", "E3", "E2", "E5"},
-            {"E2", "E5", "E1", "E3", "E4"},
-            {"E3", "E4", "E5", "E1", "E2"}
+            {"E2", "E3", "E5", "E1", "E4"},
+            {"E2", "E4", "E3", "E1", "E5"},
+            {"E3", "E1", "E5", "E2", "E4"},
+            {"E1", "E2", "E3", "E5", "E4"},
+            {"E1", "E4", "E2", "E5", "E3"}
     };
+
 
     private final int N = employee.length ;
 
@@ -43,13 +44,13 @@ public class LaborMarketV2 extends AbstractProblem {
         for (int i = 0; i < N; i++) {
             randomizedEmployee[i] = employee[permutation.get(i)];
             int originalIndex = permutation.get(i);
-            System.out.println(permutation.get(i));
+//            System.out.println(permutation.get(i));
 
             randomizedEmployeePref[i] = employeePref[originalIndex];  // hoán vị danh sách ưu tiên
         }
         GaleShapley matching = new GaleShapley(randomizedEmployee, company, randomizedEmployeePref, companyPref);
-
-        String[][] finalMatch = matching.calcMatches() ;
+                                                // truyền vào danh sách nhân viên cùng vơí prefer list đã được hoán vị
+        String[][] finalMatch = matching.calcMatches() ;    // lấy ra cặp ghép nhân viên công ty
 
         double totalStatisfy = 0 ;
 
@@ -59,14 +60,14 @@ public class LaborMarketV2 extends AbstractProblem {
             String companyName = finalMatch[1][i] ;
 
             int employeeIndex = matching.employIndexOf(employeeName) ;
-            for(int j = 0 ; j < N ; j++){
+            for(int j = 0 ; j < N ; j++){                   // tính tổng hài lòng của nhân viên
                 if (randomizedEmployeePref[employeeIndex][j].equals(companyName)){
                     totalStatisfy  += (N - j) ;
                     break ;
                 }
             }
             int companyIndex = matching.companyIndexOf(companyName) ;
-            for(int j = 0 ; j < N ; j++){
+            for(int j = 0 ; j < N ; j++){                        // cộng với tổng hài lòng của công ty
                 if (companyPref[companyIndex][j].equals(employeeName)){
                     totalStatisfy  += (N - j) ;
                     break;
@@ -74,7 +75,7 @@ public class LaborMarketV2 extends AbstractProblem {
             }
         }
 
-        solution.setObjective(0, -totalStatisfy);
+        solution.setObjective(0, -totalStatisfy);        // tối ưu hóa độ hài lòng
         //
         System.out.println();
         System.out.println("----------------------------------");
@@ -88,7 +89,7 @@ public class LaborMarketV2 extends AbstractProblem {
     public Solution newSolution() {
         Solution solution = new Solution(1, 1);
         Permutation permutation = new Permutation(employee.length);
-        permutation.randomize(); // Ngẫu nhiên hóa thứ tự hoán vị
+        permutation.randomize(); // Ngẫu nhiên thứ tự hoán vị
         solution.setVariable(0, permutation);
         return solution;
     }
