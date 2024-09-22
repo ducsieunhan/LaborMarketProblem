@@ -1,5 +1,6 @@
-package org.example;
+package org.example.LMPV2;
 
+import org.example.LMPV2.LaborMarketV2;
 import org.moeaframework.Executor;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;

@@ -1,6 +1,8 @@
-package org.example;
+package org.example.LMPV1;
 
 import java.text.DecimalFormat;
+
+import org.example.LMPV1.LaborMarketProblem;
 import org.moeaframework.Executor;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;

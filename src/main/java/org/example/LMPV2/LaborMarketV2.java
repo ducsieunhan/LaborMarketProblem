@@ -1,5 +1,6 @@
-package org.example;
+package org.example.LMPV2;
 
+import org.example.LMPV2.GaleShapley;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.variable.Permutation;
 import org.moeaframework.problem.AbstractProblem;

@@ -1,4 +1,4 @@
-package org.example;
+package org.example.LMPV1;
 
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.variable.BinaryVariable;
