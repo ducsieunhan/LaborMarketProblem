@@ -15,9 +15,8 @@ public class LMPMainV2 {
                 .run();
 
 
-
         for (Solution solution : result) {
-            System.out.println("Objective: " + -solution.getObjective(0));
+            System.out.println("Objective: " + solution.getObjective(0));
         }
     }
 }

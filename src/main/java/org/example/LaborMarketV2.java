@@ -4,6 +4,8 @@ import org.moeaframework.core.Solution;
 import org.moeaframework.core.variable.Permutation;
 import org.moeaframework.problem.AbstractProblem;
 
+import java.util.Arrays;
+
 public class LaborMarketV2 extends AbstractProblem {
 
 
@@ -48,9 +50,16 @@ public class LaborMarketV2 extends AbstractProblem {
 
             randomizedEmployeePref[i] = employeePref[originalIndex];  // hoán vị danh sách ưu tiên
         }
+        System.out.println(Arrays.toString(randomizedEmployee));
+        System.out.println(Arrays.deepToString(randomizedEmployeePref));
+
+
         GaleShapley matching = new GaleShapley(randomizedEmployee, company, randomizedEmployeePref, companyPref);
                                                 // truyền vào danh sách nhân viên cùng vơí prefer list đã được hoán vị
         String[][] finalMatch = matching.calcMatches() ;    // lấy ra cặp ghép nhân viên công ty
+
+        System.out.println(Arrays.deepToString(finalMatch));
+
 
         double totalStatisfy = 0 ;
 
@@ -75,7 +84,7 @@ public class LaborMarketV2 extends AbstractProblem {
             }
         }
 
-        solution.setObjective(0, -totalStatisfy);        // tối ưu hóa độ hài lòng
+        solution.setObjective(0, totalStatisfy);        // tối ưu hóa độ hài lòng
         //
         System.out.println();
         System.out.println("----------------------------------");

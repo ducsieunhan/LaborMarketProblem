@@ -44,7 +44,7 @@ public class GaleShapley {
                 if (companyAccepter[index] == null)   // kiếm tra xem công ty đó đã có ai ứng tuyển chưa
                 {
                     companyAccepter[index] = employee[free];
-                    employApply[free] = true;  // nhân viên ở vị trí free đã ứng tuyển
+                    employApply[free] = true;  // nhân viên ở vị trí free đc ứng tuyển
                     AppliedCount++;
                 }
                 else
@@ -54,8 +54,7 @@ public class GaleShapley {
                     {
                         companyAccepter[index] = employee[free];
                         employApply[free] = true;
-                        employApply[employIndexOf(currentPartner)] = false;  // nhân viên ở danh sách ưu tiên thấp hơn
-                                                                            // trở về không ứng tuyển thành công
+                        employApply[employIndexOf(currentPartner)] = false;  // nhân viên trước đó become unemployed
                     }
                 }
             }
