@@ -45,7 +45,8 @@ public class LaborMarketV2 extends AbstractProblem {
         for (int i = 0; i < N; i++) {
             randomizedEmployee[i] = employee[permutation.get(i)];
             int originalIndex = permutation.get(i);
-//            System.out.println(permutation.get(i));
+
+//            System.out.print(randomizedEmployee[i] + " ");
 
             randomizedEmployeePref[i] = employeePref[originalIndex];  // hoán vị danh sách ưu tiên
         }
@@ -77,13 +78,8 @@ public class LaborMarketV2 extends AbstractProblem {
         }
 
         solution.setObjective(0, -totalStatisfy);        // tối ưu hóa độ hài lòng
-        //
-        System.out.println();
-        System.out.println("----------------------------------");
-        System.out.println("Kết quả ghép cặp: ");
-        for (int i = 0 ; i < N ; i++){
-            System.out.println(finalMatch[0][i] + " vào công ty " + finalMatch[1][i]);
-        }
+
+        solution.setAttribute("matches", finalMatch);
     }
 
     @Override
