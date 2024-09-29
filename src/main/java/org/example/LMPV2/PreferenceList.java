@@ -36,7 +36,7 @@ public class PreferenceList {
                 /*E4*/{5200, 6200, 4000, 3500, 5400},
                 /*E5*/{4500, 5000, 5200, 4700, 5800}
         };
-        String[][] employeePref = PreferenceListnotcomit.to("company" , salary);
+        String[][] employeePref = PreferenceList.to("company" , salary);
         System.out.println(Arrays.deepToString(employeePref));
     }
 }
