@@ -12,8 +12,8 @@ public class LMPMainV2 {
 
         NondominatedPopulation result = new Executor()
                 .withProblem(problem)
-                .withAlgorithm("NSGAII")
-                .withMaxEvaluations(100)
+                .withAlgorithm("NSGAIII")
+                .withMaxEvaluations(1000)
                 .run();
 
 
