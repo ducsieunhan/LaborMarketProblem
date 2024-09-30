@@ -9,7 +9,7 @@ cách thức hoạt động của thuật toán calcMatches:
   - lấy ra danh sách ưu tiên bác sĩ của bệnh nhân 
   - TH1: nếu bác sĩ chưa được ghép :
 	+ khởi tạo Set<String> newTriplet , thêm bệnh nhân + bác sĩ vào 
-	+ tiến tới giai đoạn 2, ghép bệnh viện: 
+	+ tiến tới giai đoạn 2, ghép bệnh viện, lựa chọn bệnh viện dựa trên danh sách ưu tiên của bác sĩ - bệnh viện: 
 		- TH1: nếu bệnh viện chưa được ghép : 
 			+ add bệnh viện vào newTriplet, hoàn thành ghép cặp bệnh nhân + bác sĩ + bệnh viện 
 			+ add newTriplet vào danh sách 
@@ -21,7 +21,7 @@ cách thức hoạt động của thuật toán calcMatches:
 					
 					- TH1: Ưu tiên cặp cũ, break, không có gì thay đổi, cặp mới tìm bệnh viện khác để ghép 
 					- TH2: ưu tiên cặp mới: + xóa cặp triplet cũ khỏi list, thêm triplet mới vào list 
-   - TH2: nếu bác sĩ chưa được ghép, xem xét mức độ ưu tiên của bệnh nhân mới - cũ 
+   - TH2: nếu bác sĩ đã được ghép, xem xét mức độ ưu tiên của bệnh nhân mới - cũ 
 	+ nếu ưu tiên bệnh nhân cũ, break, cặp triplet cũ được giữ lại 
 	+ nếu ưu tiên bệnh nhân mới, xóa cặp triplet cũ khỏi list, thêm triplet mới ( lúc này là bệnh nhân - bác sĩ và tiếp tục vòng lặp ghép với bệnh viện )
 
