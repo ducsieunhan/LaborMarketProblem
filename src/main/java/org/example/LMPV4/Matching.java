@@ -1,6 +1,7 @@
 package org.example.LMPV4;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -57,11 +58,12 @@ public class Matching {
         patientMatched = new boolean[N];
         doctorMatched = new boolean[N];
         hospitalMatched = new boolean[N];
+
         doctorAccepter = new String[N];
         hospitalAccepter = new String[N];
     }
 
-    // Tính toán ghép triplet giữa bệnh nhân - bác sĩ - bệnh viện
+    // Tính toán ghép triplet giữa bệnh nhân - bác sĩ - phòng bệnh
 
 
     // Kiểm tra ưu tiên giữa hai bệnh nhân đối với một bác sĩ
@@ -75,7 +77,7 @@ public class Matching {
         return false;
     }
 
-    // Kiểm tra ưu tiên giữa hai triplet (bệnh nhân - bác sĩ) đối với một bệnh viện
+    // Kiểm tra ưu tiên giữa hai triplet (bệnh nhân - bác sĩ) đối với một phòng bệnh
     private boolean morePreferenceHos(String prevPa, String prevDoc, String newPa, String newDoc, int indexOfHos) {
         // Lấy index của bệnh nhân và bác sĩ cũ trong danh sách ưu tiên của bệnh viện
         int indexPrevPa = getIndex(hosToPa[indexOfHos], prevPa);
@@ -102,14 +104,6 @@ public class Matching {
         return Integer.MAX_VALUE;  // Nếu không tìm thấy, trả về giá trị lớn để không ưu tiên
     }
 
-
-    //    private final String[][] hosPref = {    // bệnh viện đang xét là 3
-    //            {"E2", "E3", "E5", "E1", "E4"},
-    //            {"E2", "E4", "E3", "E1", "E5"},
-    //            {"E3", "E1", "E5", "E2", "E4"},
-    //            {"E1", "E2", "E3", "E5", "E4"},
-    //            {"E1", "E4", "E2", "E5", "E3"}
-    //    };
 
     // Tìm chỉ số trong danh sách đối tượng dựa trên tên
     private int getIndexInList(String str, String[] listObjects) {
@@ -163,8 +157,8 @@ public class Matching {
                 // Kiểm tra nếu bác sĩ chưa ghép với ai
                 if (doctorAccepter[docIndex] == null) {
                     doctorAccepter[docIndex] = patients[freePatient];  // Ghép bác sĩ với bệnh nhân
-                    patientMatched[freePatient] = true;
-                    doctorMatched[docIndex] = true;
+                    patientMatched[freePatient] = true;         //[x, null, null, null, null]
+                    doctorMatched[docIndex] = true;           // [null, null, x, null, null]
 
                     // Gọi phương thức assignHospital để ghép bác sĩ với bệnh viện
                     assignHospital(freePatient, docIndex);
@@ -192,13 +186,17 @@ public class Matching {
 
 
     private boolean assignHospital(int freePatient, int docIndex) {
-        for (int j = 0; j < N && !hospitalMatched[docIndex]; j++) {
+        for (int j = 0; j < N ; j++) {
             String preferredHos = docToHos[docIndex][j];  // Bệnh viện mà bác sĩ đang muốn ghép
             int hosIndex = getIndexInList(preferredHos, hospitals);
 
             // Nếu bệnh viện chưa ghép với ai
             if (hospitalAccepter[hosIndex] == null) {
-                Set<String> newTriplet = Set.of(patients[freePatient], doctors[docIndex], hospitals[hosIndex]);
+//                Set<String> newTriplet = Set.of(patients[freePatient], doctors[docIndex], hospitals[hosIndex]);
+                Set<String> newTriplet = new HashSet<>();
+                newTriplet.add(patients[freePatient]);
+                newTriplet.add(doctors[docIndex]);
+                newTriplet.add(hospitals[hosIndex]);
                 hospitalAccepter[hosIndex] = patients[freePatient] + "-" + doctors[docIndex];
                 hospitalMatched[docIndex] = true;  // Đánh dấu bác sĩ đã ghép với bệnh viện
                 tripletList.add(newTriplet);  // Thêm cặp triplet vào danh sách
@@ -230,7 +228,12 @@ public class Matching {
                     AppliedCount--;
 
                     // Ghép cặp mới
-                    Set<String> newTriplet = Set.of(patients[freePatient], doctors[docIndex], hospitals[hosIndex]);
+//                    Set<String> newTriplet = Set.of(patients[freePatient], doctors[docIndex], hospitals[hosIndex]);
+                    Set<String> newTriplet = new HashSet<>();
+                    newTriplet.add(patients[freePatient]);
+                    newTriplet.add(doctors[docIndex]);
+                    newTriplet.add(hospitals[hosIndex]);
+
                     hospitalAccepter[hosIndex] = patients[freePatient] + "-" + doctors[docIndex];
                     tripletList.add(newTriplet);  // Thêm cặp triplet mới vào danh sách
                     hospitalMatched[docIndex] = true;
@@ -251,44 +254,44 @@ public class Matching {
 
         // Danh sách ưu tiên của bệnh nhân đối với bác sĩ
         String[][] patientToDocPref = {
-                {"D1", "D2", "D3"},  // P1 ưu tiên D1, sau đó D2, cuối cùng là D3
-                {"D2", "D1", "D3"},  // P2 ưu tiên D2, sau đó D1, cuối cùng là D3
-                {"D3", "D1", "D2"}   // P3 ưu tiên D3, sau đó D1, cuối cùng là D2
+                {"D1", "D2", "D3"},
+                {"D2", "D1", "D3"},
+                {"D3", "D1", "D2"}
         };
 
         // Danh sách ưu tiên của bệnh nhân đối với bệnh viện
         String[][] patientToHosPref = {
-                {"H1", "H2", "H3"},  // P1 ưu tiên H1, sau đó H2, cuối cùng là H3
-                {"H2", "H1", "H3"},  // P2 ưu tiên H2, sau đó H1, cuối cùng là H3
-                {"H3", "H1", "H2"}   // P3 ưu tiên H3, sau đó H1, cuối cùng là H2
+                {"H1", "H2", "H3"},
+                {"H3", "H2", "H1"},
+                {"H3", "H1", "H2"}
         };
 
         // Danh sách ưu tiên của bác sĩ đối với bệnh nhân
         String[][] docToPaPref = {
-                {"P1", "P2", "P3"},  // D1 ưu tiên P1, sau đó P2, cuối cùng là P3
-                {"P2", "P1", "P3"},  // D2 ưu tiên P2, sau đó P1, cuối cùng là P3
-                {"P3", "P1", "P2"}   // D3 ưu tiên P3, sau đó P1, cuối cùng là P2
+                {"P1", "P2", "P3"},
+                {"P1", "P3", "P2"},
+                {"P3", "P1", "P2"}
         };
 
         // Danh sách ưu tiên của bác sĩ đối với bệnh viện
         String[][] docToHosPref = {
-                {"H1", "H2", "H3"},  // D1 ưu tiên H1, sau đó H2, cuối cùng là H3
-                {"H2", "H1", "H3"},  // D2 ưu tiên H2, sau đó H1, cuối cùng là H3
-                {"H3", "H1", "H2"}   // D3 ưu tiên H3, sau đó H1, cuối cùng là H2
+                {"H1", "H2", "H3"},
+                {"H2", "H1", "H3"},
+                {"H3", "H1", "H2"}
         };
 
         // Danh sách ưu tiên của bệnh viện đối với bệnh nhân
         String[][] hosToPaPref = {
-                {"P1", "P2", "P3"},  // H1 ưu tiên P1, sau đó P2, cuối cùng là P3
-                {"P2", "P1", "P3"},  // H2 ưu tiên P2, sau đó P1, cuối cùng là P3
-                {"P3", "P1", "P2"}   // H3 ưu tiên P3, sau đó P1, cuối cùng là P2
+                {"P1", "P2", "P3"},
+                {"P2", "P1", "P3"},
+                {"P3", "P1", "P2"}
         };
 
         // Danh sách ưu tiên của bệnh viện đối với bác sĩ
         String[][] hosToDocPref = {
-                {"D1", "D2", "D3"},  // H1 ưu tiên D1, sau đó D2, cuối cùng là D3
-                {"D2", "D1", "D3"},  // H2 ưu tiên D2, sau đó D1, cuối cùng là D3
-                {"D3", "D1", "D2"}   // H3 ưu tiên D3, sau đó D1, cuối cùng là D2
+                {"D3", "D2", "D1"},
+                {"D2", "D1", "D3"},
+                {"D3", "D1", "D2"}
         };
 
         // Tạo đối tượng Matching với dữ liệu trên
@@ -306,5 +309,6 @@ public class Matching {
         for (Set<String> triplet : matching.tripletList) {
             System.out.println(triplet);
         }
+        System.out.println(matching.AppliedCount);
     }
 }
