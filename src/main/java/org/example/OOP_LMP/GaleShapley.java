@@ -1,4 +1,4 @@
-package org.example.LMPV2;
+package org.example.OOP_LMP;
 
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.variable.Permutation;
