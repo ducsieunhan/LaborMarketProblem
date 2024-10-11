@@ -1,6 +1,9 @@
 package org.example.OOP_LMP;
 
+import javax.swing.plaf.IconUIResource;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Matching {
     final static int PADDING = 5;  //padding
@@ -26,26 +29,63 @@ public class Matching {
                     /*13*/ {3,0,1,4,2,  5,6,8,7,9},
                     /*14*/ {2,3,1,0,4,  7,5,9,8,6}
             };
+    // Method to get the index of an element in an array
+    public static int getIndex(int[] array, int element) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == element) {
+                return i; // Return the index if the element is found
+            }
+        }
+        return -1; // Return -1 if the element is not found
+    }
 
+
+    //từ điểm chuyển sang preflist //ABprefC
+    //tiêu chuẩn phải là int[][] giống như data set ban đâu nhưng để String để áp dụng đượcc vào thuật toán cũ lun
+    public static String[][] scoreToPref(int[][] scores, int setOrder){
+        String[][] pref = new String[PADDING][PADDING];
+        for (int i=0; i < PADDING; i++){
+            int[] score = scores[i];
+            int n = score.length;
+            int count = 0;
+            for (int k = 0; k < n ; k++) {
+                int minIndex = k;  // Giả định phần tử nhỏ nhất là phần tử hiện tại
+                // Tìm phần tử nhỏ nhất trong đoạn còn lại của mảng
+                for (int j = 0; j < n; j++) {
+                    if (score[j] < score[minIndex]) {
+                        minIndex = j;  // Cập nhật vị trí của phần tử nhỏ nhất
+                    }
+                }
+                score[minIndex]=999999999;
+                pref[i][count]=POPULATION[PADDING *setOrder + minIndex];
+                count++;
+            }
+        }
+        return pref;
+    }
     public static void main(String[] args) {
 
         //initalize person object
         Person[] people = new Person[SIZE];
-        for (int i = 0; i < SIZE; i++){
+        for (int i = 0; i < SIZE; i++) { //assign preference list
             int[] firstHalf = Arrays.copyOfRange(PREFERENCE_LIST[i], 0, PADDING);
-            int[] secondHalf = Arrays.copyOfRange(PREFERENCE_LIST[i], PADDING, PADDING*2);
-            people[i]= new Person(POPULATION[i], firstHalf, secondHalf );
+            int[] secondHalf = Arrays.copyOfRange(PREFERENCE_LIST[i], PADDING, PADDING * 2);
+            people[i] = new Person(POPULATION[i], firstHalf, secondHalf);
         }
 
         //gale shapley lan thu nhat
-        //format lại để ap dụng thuật toán cũ
+            //format lại để ap dụng thuật toán cũ
         String[] setA = new String[PADDING];
         String[] setB = new String[PADDING];
+        String[] setC = new String[PADDING];
         String[][] Apref = new String[PADDING][PADDING];
         String[][] Bpref = new String[PADDING][PADDING];
-        for (int i = 0; i<PADDING; i++){
-            setA[i]= people[i].getName();
-            setB[i]= people[PADDING + i].getName();
+
+
+        for (int i = 0; i < PADDING; i++) {
+            setA[i] = people[i].getName();
+            setB[i] = people[PADDING + i].getName();
+            setC[i] = people[PADDING * 2+ i].getName();
 
             //vì object trả về int[] mà thuật toán cũ yêu cầu String[]
             String[] stringArrayA = new String[PADDING];
@@ -58,12 +98,75 @@ public class Matching {
             String[] stringArrayB = new String[PADDING];
             // Vòng lặp qua từng phần tử để gán chỉ số vào mảng String
             for (int j = 0; j < PADDING; j++) {
-                stringArrayB[j] = POPULATION[people[i].getPrefForFirstSet()[j]]; // Gán phần tử tương ứng
+                stringArrayB[j] = POPULATION[people[PADDING*2+i].getPrefForFirstSet()[j]]; // Gán phần tử tương ứng
             }
             Bpref[i] = stringArrayB;
         }
+
+        //first match
         GaleShapley matching = new GaleShapley(setA, setB, Apref, Bpref);
-        String[][] firstMatching = matching.calcMatches() ;
-        System.out.println(Arrays.deepToString(firstMatching));
+        String[][] firstMatching = matching.calcMatches();
+            //assign matched to B person object
+        for (int i = 0; i<PADDING; i++){
+            people[PADDING+i].setFirstMatch(Arrays.asList(POPULATION).indexOf(firstMatching[0][i]));  //int
+
+            /**
+             * HAVEN'T DONE: assign matched to A person object
+             */
+
+
+        }
+        //combine preference
+
+        int[][] scores = new int[PADDING][PADDING];
+        for (int i = 0; i<PADDING;i++){
+            int[] BprefC = people[PADDING + i].getPrefForSecondSet();
+            int[] AprefC = people[people[PADDING+i].getFirstMatch()].getPrefForSecondSet();
+            for (int j = 0; j<PADDING;j++){
+                //tinh diem
+                scores[i][j]= getIndex(BprefC, PADDING*2 + j);
+                scores[i][j]+= getIndex(AprefC, PADDING*2 + j);
+            }
+        }
+
+            //từ điểm chuyển sang preflist //ABprefC
+        String[][] ABprefC = scoreToPref(scores, 2);
+
+            //CprefAB
+            //calculate score
+        int[][] scores2 = new int[PADDING][PADDING];
+        for (int i = 0; i<PADDING;i++){
+            int[] CprefA = people[PADDING*2 + i].prefForFirstSet;
+            int[] CprefB = people[PADDING*2 + i].prefForSecondSet;
+            int[] score2 = scores2[i];
+            for (int j = 0; j<PADDING;j++){
+                //tinh diem
+                score2[j]= getIndex(CprefB, PADDING + j);
+                score2[j]+= getIndex(CprefA, people[PADDING + j].getFirstMatch());
+            }
+        }
+            //score to preference
+        String[][] CprefAB  = scoreToPref(scores2,1); //actually B now will represent the first match A-B,
+        // so it can be think of CprefB-new
+
+        //second match
+        GaleShapley matching2 = new GaleShapley(setC, setB, CprefAB, ABprefC);
+        String[][] seccondMatching = matching2.calcMatches();
+        //assign to set B
+        for (int i = 0; i<PADDING; i++) {
+            people[PADDING + i].setSecondMatch(Arrays.asList(POPULATION).indexOf(seccondMatching[0][i]));  //int
+        }
+
+        /**
+         * In ra kết quả thui nè !!!!!!!
+         */
+        String[][] tripletMatchResult = new String[PADDING][3];
+        for (int i = 0; i<PADDING; i++){
+            String[] tripletMatch = tripletMatchResult[i];
+            tripletMatch[0]= POPULATION[people[PADDING+i].getFirstMatch()];
+            tripletMatch[1]= POPULATION[PADDING+i];
+            tripletMatch[2]= POPULATION[people[PADDING+i].getSecondMatch()];
+            System.out.println(Arrays.toString(tripletMatch));
+        }
     }
 }
