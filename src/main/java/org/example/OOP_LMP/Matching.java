@@ -29,6 +29,9 @@ public class Matching {
                     /*13*/ {3,0,1,4,2,  5,6,8,7,9},
                     /*14*/ {2,3,1,0,4,  7,5,9,8,6}
             };
+
+
+
     // Method to get the index of an element in an array
     public static int getIndex(int[] array, int element) {
         for (int i = 0; i < array.length; i++) {
@@ -40,8 +43,9 @@ public class Matching {
     }
 
 
-    //từ điểm chuyển sang preflist //ABprefC
-    //tiêu chuẩn phải là int[][] giống như data set ban đâu nhưng để String để áp dụng đượcc vào thuật toán cũ lun
+    //từ điểm chuyển sang preflist
+    //tiêu chuẩn phải là int[][] giống như data set ban đâu nhưng trả về String[][] để áp dụng đượcc vào thuật toán cũ lun, đỡ phải format lại
+    //phần tử trong mảng score có giá trị nhỏ hơn(tức là có index nhỏ trong preference list đc quy là được ưu tiên hơn
     public static String[][] scoreToPref(int[][] scores, int setOrder){
         String[][] pref = new String[PADDING][PADDING];
         for (int i=0; i < PADDING; i++){
@@ -74,50 +78,53 @@ public class Matching {
         }
 
         //gale shapley lan thu nhat
-            //format lại để ap dụng thuật toán cũ
+            //format lại để ap dụng thuật toán cũ (gale shapley)
         String[] setA = new String[PADDING];
         String[] setB = new String[PADDING];
         String[] setC = new String[PADDING];
-        String[][] Apref = new String[PADDING][PADDING];
-        String[][] Bpref = new String[PADDING][PADDING];
+            //vì  thuật toán cũ yêu cầu String[] mà object trả về int[] nên phải kởi tạo lại preflist
+        String[][] AprefB = new String[PADDING][PADDING];
+        String[][] BprefA = new String[PADDING][PADDING];
 
 
         for (int i = 0; i < PADDING; i++) {
             setA[i] = people[i].getName();
             setB[i] = people[PADDING + i].getName();
             setC[i] = people[PADDING * 2+ i].getName();
-
-            //vì object trả về int[] mà thuật toán cũ yêu cầu String[]
+            //khởi tạo lại pref list A và B
             String[] stringArrayA = new String[PADDING];
-            // Vòng lặp qua từng phần tử để gán chỉ số vào mảng String
+                // Vòng lặp qua từng phần tử để gán chỉ số vào mảng String
             for (int j = 0; j < PADDING; j++) {
                 stringArrayA[j] = POPULATION[people[i].getPrefForFirstSet()[j]]; // Gán phần tử tương ứng
             }
-            Apref[i] = stringArrayA;
+            AprefB[i] = stringArrayA;
 
             String[] stringArrayB = new String[PADDING];
-            // Vòng lặp qua từng phần tử để gán chỉ số vào mảng String
+                // Vòng lặp qua từng phần tử để gán chỉ số vào mảng String
             for (int j = 0; j < PADDING; j++) {
                 stringArrayB[j] = POPULATION[people[PADDING*2+i].getPrefForFirstSet()[j]]; // Gán phần tử tương ứng
             }
-            Bpref[i] = stringArrayB;
+            BprefA[i] = stringArrayB;
         }
 
         //first match
-        GaleShapley matching = new GaleShapley(setA, setB, Apref, Bpref);
+        GaleShapley matching = new GaleShapley(setA, setB, AprefB, BprefA);
         String[][] firstMatching = matching.calcMatches();
-            //assign matched to B person object
+            //assign first matched to B person object
         for (int i = 0; i<PADDING; i++){
             people[PADDING+i].setFirstMatch(Arrays.asList(POPULATION).indexOf(firstMatching[0][i]));  //int
-
-            /**
-             * HAVEN'T DONE: assign matched to A person object
-             */
-
-
         }
-        //combine preference
+        /**
+         * HAVEN'T DONE: assign matched to A person object
+         */
 
+        //combine preference
+        //kết hợp pref list của A và B trong mỗi cặp vừa ghép để thành pref list của cặp với setC
+        //trong bài này sẽ lấy phần tử B đại diện luôn cho cặp đã ghép
+        //xét index của mỗi phần tử C trong 2 mảng pref của A B để tính điểm, => scores[][]
+        //chuyển scores thành pref list của cặp với C (ABprefC)
+
+            //tinh điểm
         int[][] scores = new int[PADDING][PADDING];
         for (int i = 0; i<PADDING;i++){
             int[] BprefC = people[PADDING + i].getPrefForSecondSet();
@@ -132,7 +139,9 @@ public class Matching {
             //từ điểm chuyển sang preflist //ABprefC
         String[][] ABprefC = scoreToPref(scores, 2);
 
-            //CprefAB
+         //ket hợp pref list của C với A và B thành 1 pref list với cặp A-B đã ghép trước đo
+        //xét index của A và B của cặp đã ghép trong 2 pref list của C để tính điểm => scores2[][]
+        //chuyển scores2 thành pref list của C với cặp ( CprefAB )
             //calculate score
         int[][] scores2 = new int[PADDING][PADDING];
         for (int i = 0; i<PADDING;i++){
@@ -146,8 +155,9 @@ public class Matching {
             }
         }
             //score to preference
-        String[][] CprefAB  = scoreToPref(scores2,1); //actually B now will represent the first match A-B,
-        // so it can be think of CprefB-new
+        String[][] CprefAB  = scoreToPref(scores2,1);
+            //actually B now will represent the first match A-B,
+            // so it can be think like CprefB-new
 
         //second match
         GaleShapley matching2 = new GaleShapley(setC, setB, CprefAB, ABprefC);
